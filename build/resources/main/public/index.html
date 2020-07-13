@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+    <title>VierGewinnt</title>
+    <style>
+        .board
+        {
+            height: 75vh;
+            width: 100%;
+            margin-top: 5%;
+        }
+        .PlayerA
+        {
+            height: 50vh;
+            width: 100%;
+            margin-top: 10%;
+            border: 3px solid gray;
+        }
+        .PlayerB
+        {
+            height: 50vh;
+            width: 100%;
+            margin-top: 10%;
+            border: 3px solid gray;
+        }
+        .PlayerName
+        {
+            text-align: center;
+            color: darkred;
+        }
+        .SpielsteinA
+        {
+            font-size: 30px;
+            text-align: center;
+            color: darkred;
+        }
+        .textview
+        {
+            width: 200px;
+            border: 1px solid darkred;
+        }
+        h3
+        {
+            font-size: 40px;
+        }
+        td
+        {
+            width: 1%;
+            height: 75px;
+            border: 1px solid black;
+            text-align: center;
+            background-color: gray;
+        }
+        input
+        {
+            width: 30px;
+        }
+        .circle
+        {
+            width: 75px;
+            height: 75px;
+            background-color: white;
+            border-radius: 75px;
+        }
+        #startbutton
+        {
+            width: 100%;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .funtion
+        {
+            width: auto;
+            color: black;
+            border-radius: 10px;
+            border: 1px solid cadetblue;
+            margin-top: 20px;
+        }
+        .funtion:hover
+        {
+            background-color: dodgerblue;
+            color: white;
+        }
+        #startbutton:hover
+        {
+            background-color: dodgerblue;
+            color: white;
+        }
+    </style>
+    <script src="script.js"></script>
+
+</head>
+<body>
+<div class="row no-gutters">
+    <div class="col no-gutters">
+        <div class="PlayerA" id="playerA">
+            <h1 class="PlayerName" id="playerName1">Player A</h1>
+            <h2 class="SpielsteinA" id="playerSpielsteine1">21 Spielsteine</h2>
+        </div>
+        <form name="form">
+            <input class="textview" placeholder="name" id="playerAname">
+            <input class="textview" placeholder="color" id="playerAcolor">
+        </form>
+        <div>
+            <input type="button" class="funtion" onclick="sendRequestGET('computer')" id="findbestmove" value="play the best move">
+            <input type="button" class="funtion" onclick="undomove()" id="undobutton" value="undo last move">
+            <input disabled class="funtion" type="button" onclick="(sendRequestGET('test?'))" id="testbutton" value="run Tests">
+        </div>
+    </div>
+    <div class = "col no-gutters">
+        <div class="board" id="board">
+            <h3 id="result"></h3>
+            <table>
+                <tr>
+                    <td><div id="place(1,6)" class="circle"></div></td>
+                    <td><div id="place(2,6)" class="circle"></div></td>
+                    <td><div id="place(3,6)" class="circle"></div></td>
+                    <td><div id="place(4,6)" class="circle"></div></td>
+                    <td><div id="place(5,6)" class="circle"></div></td>
+                    <td><div id="place(6,6)" class="circle"></div></td>
+                    <td><div id="place(7,6)" class="circle"></div></td>
+                </tr>
+                <tr>
+                    <td><div id="place(1,5)" class="circle"></div></td>
+                    <td><div id="place(2,5)" class="circle"></div></td>
+                    <td><div id="place(3,5)" class="circle"></div></td>
+                    <td><div id="place(4,5)" class="circle"></div></td>
+                    <td><div id="place(5,5)" class="circle"></div></td>
+                    <td><div id="place(6,5)" class="circle"></div></td>
+                    <td><div id="place(7,5)" class="circle"></div></td>
+                </tr>
+                <tr>
+                    <td><div id="place(1,4)" class="circle"></div></td>
+                    <td><div id="place(2,4)" class="circle"></div></td>
+                    <td><div id="place(3,4)" class="circle"></div></td>
+                    <td><div id="place(4,4)" class="circle"></div></td>
+                    <td><div id="place(5,4)" class="circle"></div></td>
+                    <td><div id="place(6,4)" class="circle"></div></td>
+                    <td><div id="place(7,4)" class="circle"></div></td>
+                </tr>
+                <tr>
+                    <td><div id="place(1,3)" class="circle"></div></td>
+                    <td><div id="place(2,3)" class="circle"></div></td>
+                    <td><div id="place(3,3)" class="circle"></div></td>
+                    <td><div id="place(4,3)" class="circle"></div></td>
+                    <td><div id="place(5,3)" class="circle"></div></td>
+                    <td><div id="place(6,3)" class="circle"></div></td>
+                    <td><div id="place(7,3)" class="circle"></div></td>
+                </tr>
+                <tr>
+                    <td><div id="place(1,2)" class="circle"></div></td>
+                    <td><div id="place(2,2)" class="circle"></div></td>
+                    <td><div id="place(3,2)" class="circle"></div></td>
+                    <td><div id="place(4,2)" class="circle"></div></td>
+                    <td><div id="place(5,2)" class="circle"></div></td>
+                    <td><div id="place(6,2)" class="circle"></div></td>
+                    <td><div id="place(7,2)" class="circle"></div></td>
+                </tr>
+                <tr>
+                    <td><div id="place(1,1)" class="circle"></div></td>
+                    <td><div id="place(2,1)" class="circle"></div></td>
+                    <td><div id="place(3,1)" class="circle"></div></td>
+                    <td><div id="place(4,1)" class="circle"></div></td>
+                    <td><div id="place(5,1)" class="circle"></div></td>
+                    <td><div id="place(6,1)" class="circle"></div></td>
+                    <td><div id="place(7,1)" class="circle"></div></td>
+                </tr>
+                <tr>
+                    <td style="border: 0 white"><input disabled id="play0" onclick="play('0')" type="button" value="▼"></td>
+                    <td style="border: 0 white"><input disabled id="play1" onclick="play('1')" type="button" value="▼"></td>
+                    <td style="border: 0 white"><input disabled id="play2" onclick="play('2')" type="button" value="▼"></td>
+                    <td style="border: 0 white"><input disabled id="play3" onclick="play('3')" type="button" value="▼"></td>
+                    <td style="border: 0 white"><input disabled id="play4" onclick="play('4')" type="button" value="▼"></td>
+                    <td style="border: 0 white"><input disabled id="play5" onclick="play('5')" type="button" value="▼"></td>
+                    <td style="border: 0 white"><input disabled id="play6" onclick="play('6')" type="button" value="▼"></td>
+                </tr>
+                <tr><input type="button" onclick="startgame()" id="startbutton" value="Start"></tr>
+                 </table>
+        </div>
+    </div>
+    <div class="col no-gutters">
+        <div class="PlayerB" id="playerB">
+            <h1 class="PlayerName" id="playerName2">Player B</h1>
+            <h2 class="SpielsteinA" id="playerSpielsteine2">21 Spielsteine</h2>
+        </div>
+        <div>
+            <input class="textview" placeholder="name" id="playerBname">
+            <input class="textview" placeholder="color" id="playerBcolor">
+        </div>
+        <div>
+            <input type="checkbox" id="PlayWithComputer" checked>
+            <label for="PlayWithComputer">PlayWithComputer</label>
+        </div>
+        <div>
+            <input type="checkbox" id="humanstarts" checked>
+            <label for="humanstarts">human starts playing</label>
+        </div>
+    </div>
+</div>
+</body>
+</html>
