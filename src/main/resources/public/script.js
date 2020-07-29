@@ -3,7 +3,7 @@
     function startgame() {
      /**reset the colors of the
         tiles to white*/
-        FarbenHerstellen()
+     Farbenzurücksetzen()
         /**
          * check if there ara values in the text fields
          */
@@ -30,7 +30,7 @@
         sendRequestGET('undo?')
     }
 
-    function FarbenHerstellen() {
+    function Farbenzurücksetzen() {
         let i;
         for (i = 1; i <= 7; i++)
         {
@@ -43,6 +43,7 @@
             document.getElementById('play'+i).disabled = false
         document.getElementById('testbutton').disabled = false
         document.getElementById("result").innerHTML = ""
+        document.getElementById("timer").innerHTML = ""
         document.getElementById("playerSpielsteine1").innerHTML = "21"
         document.getElementById("playerSpielsteine2").innerHTML = "21"
     }
@@ -67,15 +68,15 @@
     {
         if (http2.readyState === 4 && http2.status === 200 && this.responseText !== "")
         {
-            const infos = this.responseText.split(".")
-            setzeInfos(infos[0], infos[1], infos[2], infos[3], infos[4], infos[5])
+            const infos = this.responseText.split("_")
+            setzeInfos(infos[0], infos[1], infos[2], infos[3], infos[4], infos[5], infos[6])
         }
     }
 
     http.onreadystatechange = function loadresult() {
-        if (this.readyState === 4 && http.status === 200 && this.responseText.split(".")[0] === "deleted")
+        if (this.readyState === 4 && http.status === 200 && this.responseText.split("_")[0] === "deleted")
         {
-            const infos = this.responseText.split(".")
+            const infos = this.responseText.split("_")
             // deleted.place().SpielerID.Spielsteine
             document.getElementById(infos[1]).style.backgroundColor = "white"
             document.getElementById("playerSpielsteine"+infos[2]).innerHTML = infos[3]
@@ -85,8 +86,8 @@
         else if(this.readyState === 4 && http.status === 200 && this.responseText !== "")
         {
             //Platz-Spielername-Farbe-spielsteineübrig-Gewinner.SpielerID
-            const infos = this.responseText.split(".")
-            setzeInfos(infos[0], infos[1], infos[2], infos[3], infos[4], infos[5])
+            const infos = this.responseText.split("_")
+            setzeInfos(infos[0], infos[1], infos[2], infos[3], infos[4], infos[5], infos[6])
 
             /**
              * if user clicked the checkbox to play with the computer
@@ -100,11 +101,10 @@
     /**
      * update the board after playing a move
      * */
-    function setzeInfos(platz ='', spielername ='', spielerfarbe ='',
-                        spielsteineuebrig ='', gewinner ='', istSpielerADran = '') {
-        console.log(gewinner)
+    function setzeInfos(platz ='', spielername ='', spielerfarbe ='', spielsteineuebrig ='', gewinner ='', istSpielerADran = '', time = '') {
         if (platz !== 'null')
             document.getElementById(platz).style.backgroundColor = spielerfarbe
+        document.getElementById("timer").innerHTML = time
         if (gewinner !== "null")
         {
             if (gewinner === "unentschieden")

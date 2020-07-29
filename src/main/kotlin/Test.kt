@@ -1,21 +1,27 @@
-class Test private constructor(depth: Int, result: Boolean) {
+import java.time.Duration
+import java.time.LocalDateTime
+
+class Test private constructor(depth: Int, result: Triple<Boolean,Int,String>) {
     init {
         /**
          * print the result on the console
          * */
-
-        println("Tests running...")
-        if (depth == 1 && result)
-            println("die Spiel-Engine kann im nächsten Zug gewinnen")
-        else if (depth == 2 && result)
-            println("Die Spiel-Engine vereitelt eine unmittelbare Gewinnbedrohung des Gegners")
-        else if (depth == 3 && result)
-            println("die Spiel-Engine kann im übernächsten Zug gewinnen")
-        else if (depth == 4 && result)
-            println("Die Spiel-Engine vereitelt eine Drohung, die den Gegner im übernächsten Zug " +
-                    "ansonsten einen Gewinn umsetzen lässt")
-        else if (depth == 5 && result)
-            println("die Spiel-Engine kann im überübernächsten Zug gewinnen")
+        if (depth == 1 && result.first)
+            println("Die Spiel-Engine kann im nächsten Zug gewinnen\n" +
+                    "Der gewählte Zug ist im Spaltenindex ${result.second}\n")
+        else if (depth == 2 && result.first)
+            println("Die Spiel-Engine vereitelt eine unmittelbare Gewinnbedrohung des Gegners\n" +
+                    "Der gewählte Zug ist im Spaltenindex ${result.second}\n")
+        else if (depth == 3 && result.first)
+            println("die Spiel-Engine kann im übernächsten Zug gewinnen\n" +
+                    "Der gewählte Zug ist im Spaltenindex ${result.second}\n")
+        else if (depth == 4 && result.first)
+            println("Die Spiel-Engine kann eine Drohung, die den Gegner im übernächsten Zug " +
+                    "ansonsten einen Gewinn umsetzen lässt, vereiteln\n" +
+                    "Das Board:\n${result.third}")
+        else if (depth == 5 && result.first)
+            println("Die Spiel-Engine kann im überübernächsten Zug gewinnen\n" +
+                    "Das Board:\n${result.third}")
     }
 
     companion object
@@ -25,25 +31,39 @@ class Test private constructor(depth: Int, result: Boolean) {
          * */
         fun runTests(board: Board)
         {
-            for (i in 1..5)         Test(i, checkValues(i, board))
+            val takedtime = LocalDateTime.now()
+            println("|----------------------------------------|\n" +
+                    "|              Tests running...          |\n" +
+                    "|----------------------------------------|\n")
+            for (i in 1..5)
+            {
+                println("Test $i")
+                val res = checkValues(i, board)
+                if (res.first)
+                    Test(i, res)
+                println("----------------------------------------------------")
+            }
+            println("|----------------------------------------|\n" +
+                    "|              Tests finished...         |\n" +
+                    "|----------------------------------------|\n")
+            println("es hat ${Duration.between(takedtime, LocalDateTime.now()).toSeconds()} Seconden gedauert")
         }
 
         /**
          * return true if a test is successful
          * */
-        private fun checkValues(depth: Int, board: Board): Boolean
+        private fun checkValues(depth: Int, board: Board): Triple<Boolean,Int, String>
         {
-            val c = Computer()
             /**
              * call the minimax and get the scores of the moves
              * */
-            val values = c.runtest(board, depth)
+            val values = Computer.new_test(board, depth)
             return when (depth) {
-                1 -> values.any { x -> x > 80 }
-                2 -> values.any { x -> x < 0 && x == -100 } && values.any{ y -> y > 0}
-                3 -> values.any { x -> x > 50 }
-                4 -> values.any { x -> x < 0 } && values.any{ y -> y in -90..-80 }
-                else -> depth == 5 && values.any { x -> x > 0 }
+                1 -> Triple(values.first.keys.any { x -> x > 699 }, values.first[values.first.keys.max()!!]!!, values.third)
+                2 -> Triple(values.first.keys.any { x -> x < 0 }, values.first[values.first.keys.max()!!]!!, values.third)
+                3 -> Triple(values.first.keys.max()!! > 500, values.first[values.first.keys.max()!!]!!, values.third)
+                4 -> Triple(values.second[3], values.first[values.first.keys.max()]!!, values.third)
+                else -> Triple(depth == 5 && values.second[4], values.first[values.first.keys.max()]!!, values.third)
             }
         }
     }

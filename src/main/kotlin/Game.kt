@@ -7,7 +7,6 @@
 class Game private constructor(_board: Board, _players:ArrayList<Spieler>)
 {
     private var board:Board
-    private val c = Computer()
     private val players: ArrayList<Spieler>
     val history = ArrayList<Place>()
     /**
@@ -59,7 +58,7 @@ class Game private constructor(_board: Board, _players:ArrayList<Spieler>)
     fun computerTurn(): Place
     {
         assert(!isGameOver())
-        val col = c.bestmove(players.indexOf(currentPlayer), board, 2)
+        val col = Computer.new_move(players.indexOf(currentPlayer), board, 3)
         return make_move(col)
     }
 

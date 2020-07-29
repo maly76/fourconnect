@@ -4,30 +4,25 @@
 
 import io.javalin.Javalin
 import io.javalin.http.Context
-import java.io.File
-import java.io.FileWriter
-import java.lang.IllegalArgumentException
 import java.time.Duration
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.*
-import kotlin.random.Random
-import kotlin.streams.toList
-import kotlin.system.exitProcess
+
 
 class App {
     private lateinit var game: Game
     lateinit var currentPlayer:Spieler
     private var winner:String? = null
     private var humanstarts = false
+    var time = ""
     override fun toString(): String {
         var s: String
-        s = "${game.history.last()}."
-        s += currentPlayer.getname() + "."
-        s += currentPlayer.getfarbe() + "."
-        s += currentPlayer.spielsteine.toString() + "."
-        s += "$winner."
-        s += currentPlayer.ID
+        s = "${game.history.last()}_"
+        s += currentPlayer.getname() + "_"
+        s += currentPlayer.getfarbe() + "_"
+        s += currentPlayer.spielsteine.toString() + "_"
+        s += "${winner}_"
+        s += "${currentPlayer.ID}_"
+        s += "$time Sekunden"
         return s
     }
     init {
@@ -73,7 +68,9 @@ class App {
          * run the tests
          * */
         app.get("/test"){ctx: Context  ->
+            val takedtime = LocalDateTime.now()
             game.runTests()
+            time = ""+Duration.between(takedtime, LocalDateTime.now()).toSeconds().toInt()
             ctx.result("")
         }
 
@@ -83,8 +80,14 @@ class App {
         app.get("/computer"){ctx: Context  ->
             if (!game.isGameOver() && winner == null)
             {
+                val takedtime = LocalDateTime.now()
                 computerturn()
+                time = ""+Duration.between(takedtime, LocalDateTime.now()).toSeconds()
+                if (time.toInt() < 1)
+                    time = "0."+Duration.between(takedtime, LocalDateTime.now()).toMillis()
                 ctx.result(toString())
+                println("es hat $time " +
+                        "seconden gedauert, bis der beste Zug übermittelt wurde..")
             }
         }
 
@@ -105,7 +108,8 @@ class App {
         app.get("/undo"){ctx: Context  ->
             if (game.history.isNotEmpty())
             {
-                ctx.result("deleted.${game.undo_move()}.${game.currentPlayer.ID}.${game.currentPlayer.spielsteine}")
+                ctx.result("deleted_${game.undo_move()}_${game.currentPlayer.ID}_" +
+                        "${game.currentPlayer.spielsteine}")
             }
         }
     }
@@ -140,7 +144,4 @@ class App {
 
 fun main(args: Array<String>) {
     App()
-    /**val c = Computer()
-    c.bestmove(Board(), 5)
-    val a = Database.new("evaluated_Boards.txt").readHashmap()*/
 }

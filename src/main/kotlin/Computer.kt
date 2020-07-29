@@ -1,24 +1,31 @@
-import java.time.Duration
-import java.time.LocalDateTime
+
 /**
  * this class helps to implement the minimax and find the best move
  * */
-class Computer() : MiniMax
+class Computer private constructor() : MiniMax
 {
     override var gewuenshctetiefe: Int = 0
     override lateinit var moves_scores: HashMap<Int, Int>
-    override var col = 0
-    override lateinit var board:Board
-    /**
-     * HashMap<Board, Pair<score, move>
-     * */
-    override lateinit var storedBoards:HashMap<Long, Pair<Int,Int>>
-    override val test = ArrayList<Int>()
-    lateinit var takedtime: LocalDateTime
+    override lateinit var storedBoards:HashMap<Int, Triple<Int, Int, String>>
+    override var tests_results = arrayOf(false, false, false, false, false)
+    override var boardString: String = ""
     /**
      * get the HashMap with the boards and their evaluates from the database(text file 'evaluated_Boards.txt')
      * */
     override val database = Database.new("evaluated_Boards.txt").readHashmap()!!
+
+    companion object{
+        private val c = Computer()
+        fun new_move(id:Int, _board: Board, depth: Int):Int
+        {
+            return c.bestmove(id, _board.deepcopy(), depth)
+        }
+
+        fun new_test(_board: Board, depth: Int): Triple<HashMap<Int,Int>,Array<Boolean>, String>
+        {
+            return c.runtest(_board.deepcopy(), depth)
+        }
+    }
 
     /**
      * call the minimax to find the best move
@@ -27,29 +34,26 @@ class Computer() : MiniMax
         /**
          * save the time when the algorithm starts
          * */
-        takedtime = LocalDateTime.now()
         /**
          * clear all infos there are saved
          * */
         gewuenshctetiefe = depth
-        this.board = _board.deepcopy()
         storedBoards = HashMap()
         moves_scores = HashMap()
         /**
          * call the minimax with the board of the computer player and the specified depth
          * */
-        val i = minimax(depth, 1, this.board.bitBoards[0], 0)
+        val move_score = minimax(depth, 1, _board, 0, false)
+        //minimax(4, Int.MIN_VALUE, Int.MAX_VALUE, 1, _board, 5)
         /**
          * if desired write the boards with their values after calling the minimax to the database
          * */
-        //Database.new("evaluated_Boards.txt").writeToDatabase(storedBoards)
 
         /**
          * get the current time, subtract the two times, and print the result as the spent time
          * for finding the best move
          * */
-        println("es hat ${Duration.between(takedtime, LocalDateTime.now()).toSeconds()} " +
-                "seconden gedauert, bis der beste Zug übermittelt wurde..")
+
         /**
          * play a random move of the stored moves if there are many good moves
          * if not play a random one
@@ -66,56 +70,55 @@ class Computer() : MiniMax
              * */
             else -> moves_scores.keys.min()
         }
-        return if (moves_scores.size > 1)
-            moves_scores[score]!!
-        else
-            this.board.randomMove()
+
+        val move = when {
+            moves_scores.size > 0 -> moves_scores[score]!!
+            database.isNotEmpty() -> move_score.second
+            else -> _board.randomMove()
+        }
+        val b = _board.toString().replace("\n", "_")
+
+        /**
+         * store the board in the database if the move was made for the computer and the board is not
+         * stored
+         * */
+        if (!database.containsKey(hashBoard(_board)) && id == 0)
+            Database.new("evaluated_Boards.txt")
+                .writeToDatabase("${hashBoard(_board)},$score,$move,$b")
+        return move
     }
 
     /**
      * call the minimax to run the test and return the scores
      * */
-    fun runtest(_board: Board, depth: Int): IntArray
+    fun runtest(_board: Board, depth: Int): Triple<HashMap<Int,Int>,Array<Boolean>, String>
     {
+        boardString = ""
+        tests_results = arrayOf(false, false, false, false, false)
         gewuenshctetiefe = depth
-        this.board = _board.deepcopy()
         storedBoards = HashMap()
         moves_scores = HashMap()
-        minimax(depth, 1, this.board.bitBoards[0], 0)
-        return moves_scores.keys.toIntArray()
+        minimax(depth, 1, _board, 0, true)
+        return Triple(moves_scores,tests_results, boardString)
     }
 
     /**
      * give 100 if computer has won and -100 if enemy has won
      * else evaluate the board with the monte-carlo method after 450 randomly games
      * */
-    override fun evaluate(): Int
+    override fun evaluate(board: Board): Int
     {
-        var score = 0
-        when (val result = VierInReihe(board)) {
-            1 -> score += 100
-            -1 -> score += -100
-            else -> {
-                val number = 500
-                val values = evaluateMoves(number)
-                val maxValue = values.max()
-
-                score += when {
-                    result == 1 -> 100
-                    maxValue!! > number/2 + number/4      -> 80
-                    maxValue > number/2                   -> 50
-                    //maxValue > number/3                 -> 20
-                    //maxValue in number/4..number/3      -> -50
-                    else                                -> 0
-                }
-            }
+        val number = 700
+        return when(VierInReihe(board))
+        {
+            1           ->      number * 100
+            -1          ->      -number * 100
+            else        ->      evaluateMoves(number, board.deepcopy()).max()!!
         }
-        return score
     }
 
-    fun evaluateMoves(number: Int): ArrayList<Int>
+    fun evaluateMoves(number: Int, _board: Board): ArrayList<Int>
     {
-        val _board = board.deepcopy()
         val moves = _board.list_moves()
         val statistiken = ArrayList<IntArray>()
         val values = ArrayList<Int>()
@@ -171,11 +174,11 @@ class Computer() : MiniMax
     /**
      * check if there are four tokens in a row
      * */
-    private fun VierInReihe(_board: Board): Int
+    private fun VierInReihe(board: Board): Int
     {
         return when{
-            board.isWin(_board.bitBoards[0]) -> -1
-            board.isWin(_board.bitBoards[1]) -> 1
+            board.isWin(board.bitBoards[0]) -> -1
+            board.isWin(board.bitBoards[1]) -> 1
             else                            -> 0
         }
     }

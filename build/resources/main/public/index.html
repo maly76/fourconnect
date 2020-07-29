@@ -53,7 +53,7 @@
             height: 75px;
             border: 1px solid black;
             text-align: center;
-            background-color: gray;
+            background-color: blue;
         }
         input
         {
@@ -90,11 +90,19 @@
             background-color: dodgerblue;
             color: white;
         }
+        #timer{
+            text-align: center;
+            font-size: 20px;
+            color: green;
+        }
     </style>
     <script src="script.js"></script>
 
 </head>
 <body>
+<div>
+    <p id="timer">Timer</p>
+</div>
 <div class="row no-gutters">
     <div class="col no-gutters">
         <div class="PlayerA" id="playerA">
@@ -193,7 +201,7 @@
         </div>
         <div>
             <input type="checkbox" id="PlayWithComputer" checked>
-            <label for="PlayWithComputer">PlayWithComputer</label>
+            <label for="PlayWithComputer">Play with computer</label>
         </div>
         <div>
             <input type="checkbox" id="humanstarts" checked>

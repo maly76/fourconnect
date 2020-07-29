@@ -5,96 +5,15 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
           crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
     <title>VierGewinnt</title>
-    <style>
-        .board
-        {
-            height: 75vh;
-            width: 100%;
-            margin-top: 5%;
-        }
-        .PlayerA
-        {
-            height: 50vh;
-            width: 100%;
-            margin-top: 10%;
-            border: 3px solid gray;
-        }
-        .PlayerB
-        {
-            height: 50vh;
-            width: 100%;
-            margin-top: 10%;
-            border: 3px solid gray;
-        }
-        .PlayerName
-        {
-            text-align: center;
-            color: darkred;
-        }
-        .SpielsteinA
-        {
-            font-size: 30px;
-            text-align: center;
-            color: darkred;
-        }
-        .textview
-        {
-            width: 200px;
-            border: 1px solid darkred;
-        }
-        h3
-        {
-            font-size: 40px;
-        }
-        td
-        {
-            width: 1%;
-            height: 75px;
-            border: 1px solid black;
-            text-align: center;
-            background-color: gray;
-        }
-        input
-        {
-            width: 30px;
-        }
-        .circle
-        {
-            width: 75px;
-            height: 75px;
-            background-color: white;
-            border-radius: 75px;
-        }
-        #startbutton
-        {
-            width: 100%;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-        .funtion
-        {
-            width: auto;
-            color: black;
-            border-radius: 10px;
-            border: 1px solid cadetblue;
-            margin-top: 20px;
-        }
-        .funtion:hover
-        {
-            background-color: dodgerblue;
-            color: white;
-        }
-        #startbutton:hover
-        {
-            background-color: dodgerblue;
-            color: white;
-        }
-    </style>
     <script src="script.js"></script>
 
 </head>
 <body>
+<div>
+    <p id="timer">Timer</p>
+</div>
 <div class="row no-gutters">
     <div class="col no-gutters">
         <div class="PlayerA" id="playerA">
@@ -193,7 +112,7 @@
         </div>
         <div>
             <input type="checkbox" id="PlayWithComputer" checked>
-            <label for="PlayWithComputer">PlayWithComputer</label>
+            <label for="PlayWithComputer">Play with computer</label>
         </div>
         <div>
             <input type="checkbox" id="humanstarts" checked>

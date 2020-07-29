@@ -21,12 +21,10 @@ class Database private constructor(_file: File)
             val isFileCreated = file.createNewFile()
             return if (isFileCreated)
             {
-                println("$filename is created successfully")
                 Database(file)
             }
             else
             {
-                println("$filename already exists!!")
                 Database(File(filename))
             }
 
@@ -45,11 +43,26 @@ class Database private constructor(_file: File)
      * write a HashMap with boards and their scores to the database
      * this is a rewriting of the database, so the old content will be removed after calling this method
      * */
-    fun writeToDatabase(a: HashMap<Long, Pair<Int,Int>>)
+    fun writeToDatabase(a: HashMap<Int, Triple<Int,Int,String>>)
+    {
+        var s = ""
+        a.forEach{ x ->
+            s += ("${x.key},${x.value.first},${x.value.second}," +
+                    "${x.value.third.replace("\n", "?")}\n")
+        }
+        file.appendText(s)
+        /**file.bufferedWriter().use { out ->
+            a.forEach{ x ->
+                out.append("${x.key},${x.value.first},${x.value.second}\n")
+            }
+        }*/
+    }
+
+    fun writeToDatabase(a: Array<Array<Int>>)
     {
         file.bufferedWriter().use { out ->
             a.forEach{ x ->
-                out.append("${x.key},${x.value.first}, ${x.value.second}\n")
+                out.append("${x[0]},${x[1]}\n")
             }
         }
     }
@@ -59,7 +72,7 @@ class Database private constructor(_file: File)
      * */
     fun writeToDatabase(s: String)
     {
-        file.appendText("\n $s")
+        file.appendText("\n$s")
     }
 
     /**
@@ -75,16 +88,38 @@ class Database private constructor(_file: File)
     /**
      * return the HashMap of the stored boards and their scores if there are any, if not return null
      * */
-    fun readHashmap():HashMap<Long, Pair<Int, Int>>?
+    fun readHashmap():HashMap<Int, Triple<Int, Int, String>>?
     {
         return try {
-            val values = HashMap<Long, Pair<Int, Int>>()
+            val values = HashMap<Int, Triple<Int, Int, String>>()
+            var index: Int
+            var b = ""
             file.forEachLine { x ->
-                val array = x.split(",")
-                values[array[0].toLong()] = Pair(array[1].toInt(), array[2].toInt())
+                if (x.contains(','))
+                {
+                    val array = x.split(",")
+                    index = array[0].toInt()
+                    values[index] = Triple(array[1].toInt(), array[2].toInt(), array[3]
+                            .replace("?", "\n"))
+                }
             }
             values
         } catch (e: Exception) {
+            null
+        }
+    }
+
+    fun readTranspositionTable(): Array<Array<Int>>?
+    {
+        return try {
+            var values = arrayOf<Array<Int>>()
+            file.forEachLine { x ->
+                val array = x.split(",")
+                values += arrayOf(array[0].toInt(), array[1].toInt())
+            }
+            values
+        }
+        catch (e: Exception){
             null
         }
     }
